@@ -1,0 +1,10 @@
+F:\MINE\Projects\c#\SimpleStore\bin\Debug\SimpleStore.exe.config
+F:\MINE\Projects\c#\SimpleStore\bin\Debug\SimpleStore.exe
+F:\MINE\Projects\c#\SimpleStore\bin\Debug\SimpleStore.pdb
+F:\MINE\Projects\c#\SimpleStore\obj\Debug\SimpleStore.csprojAssemblyReference.cache
+F:\MINE\Projects\c#\SimpleStore\obj\Debug\SimpleStore.frmMain.resources
+F:\MINE\Projects\c#\SimpleStore\obj\Debug\SimpleStore.Properties.Resources.resources
+F:\MINE\Projects\c#\SimpleStore\obj\Debug\SimpleStore.csproj.GenerateResource.cache
+F:\MINE\Projects\c#\SimpleStore\obj\Debug\SimpleStore.csproj.CoreCompileInputs.cache
+F:\MINE\Projects\c#\SimpleStore\obj\Debug\SimpleStore.exe
+F:\MINE\Projects\c#\SimpleStore\obj\Debug\SimpleStore.pdb
