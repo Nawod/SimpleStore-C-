@@ -8,17 +8,24 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Data.SqlClient;
+using System.IO;
 
 namespace SimpleStore
 {
     public partial class frmMain : Form
     {
+        String filename;
+        Byte[] ImageByteArray;
+        int imageID = 0;
+        Image defaultImage;
  //connect the Database
         SqlConnection sqlCon = new SqlConnection(@"Data Source=(LocalDB)\MSSQLLocalDB;AttachDbFilename=F:\MINE\Projects\c#\SimpleStore\DB\SimpleStoreDB.mdf;Integrated Security=True;Connect Timeout=30");
         int ItemId = 0;
+        
         public frmMain()
         {
             InitializeComponent();
+            defaultImage = pictureBox1.Image;
         }
 
         private void BtnInsert_Click(object sender, EventArgs e)
@@ -30,7 +37,23 @@ namespace SimpleStore
                 {
                     sqlCon.Open();
                 }
- //Insert data to DataBase
+                //Insert data to DataBase
+                //saving image
+                if (filename == "")
+                {
+                    if (ImageByteArray.Length != 0)
+                    {
+                        ImageByteArray = new byte[] { };
+                    }
+                }
+                else
+                {
+                    Image temp = new Bitmap(filename);
+                    MemoryStream strm = new MemoryStream();
+                    temp.Save(strm, System.Drawing.Imaging.ImageFormat.Jpeg);
+                    ImageByteArray = strm.ToArray();
+                }
+                
                 if(btnInsert.Text == "INSERT")
                 {
                     SqlCommand sqlCmd = new SqlCommand("insert&update", sqlCon);
@@ -40,6 +63,7 @@ namespace SimpleStore
                     sqlCmd.Parameters.AddWithValue("@itemCd", txtCode.Text.Trim());
                     sqlCmd.Parameters.AddWithValue("@itemName", txtItem.Text.Trim());
                     sqlCmd.Parameters.AddWithValue("@itemBrand", txtBrand.Text.Trim());
+                    sqlCmd.Parameters.AddWithValue("@Iimage", ImageByteArray);
                     sqlCmd.Parameters.AddWithValue("@RDate", dte1.Value);
                     sqlCmd.ExecuteNonQuery();
                     MessageBox.Show("Successfully INSERTED");
@@ -57,6 +81,7 @@ namespace SimpleStore
                     sqlCmd.Parameters.AddWithValue("@itemName", txtItem.Text.Trim());
                     sqlCmd.Parameters.AddWithValue("@itemBrand", txtBrand.Text.Trim());
                     sqlCmd.Parameters.AddWithValue("@RDate", dte1.Value);
+                    sqlCmd.Parameters.AddWithValue("@Iimage", ImageByteArray);
                     sqlCmd.ExecuteNonQuery();
                     MessageBox.Show("Successfully UPDATED");
                     Reset();
@@ -88,6 +113,7 @@ namespace SimpleStore
             sqlDa.Fill(dtbl);
             dgvItems.DataSource = dtbl;
             dgvItems.Columns[0].Visible = false;
+            dgvItems.Columns[5].Visible = false;
             sqlCon.Close();
         }
         private void BtnSearch_Click(object sender, EventArgs e)
@@ -113,6 +139,17 @@ namespace SimpleStore
                 txtItem.Text = dgvItems.CurrentRow.Cells[2].Value.ToString();
                 txtBrand.Text = dgvItems.CurrentRow.Cells[3].Value.ToString();
                 dte1.Value = Convert.ToDateTime(dgvItems.CurrentRow.Cells[4].Value.ToString());
+                //retrive image
+                byte[] ImageArray = (byte[])dgvItems.CurrentRow.Cells[5].Value;
+                if (ImageArray.Length == 0)
+                {
+                    pictureBox1.Image = defaultImage;
+                }
+                else
+                {
+                    ImageByteArray = ImageArray;
+                    pictureBox1.Image = Image.FromStream(new MemoryStream(ImageArray));
+                }
                 btnInsert.Text = "UPDATE";
                 btnDelete.Enabled = true;
 
@@ -126,7 +163,12 @@ namespace SimpleStore
             btnInsert.Text = "INSERT";
             btnDelete.Enabled = false;
             ItemId = 0;
+            btnOpen.Enabled = true;
+            filename = "";
+            pictureBox1.Image = defaultImage;
             FillDataGridView();
+            imageID = 0;
+            
         }
 
         private void BtnReset_Click(object sender, EventArgs e)
@@ -161,6 +203,30 @@ namespace SimpleStore
             {
                 MessageBox.Show(ex.Message, "Error Message");
             }
+        }
+//open image
+
+        private void BtnOpen_Click(object sender, EventArgs e)
+        {
+            OpenFileDialog ofd = new OpenFileDialog();
+            ofd.Filter = "Images(.jpg,.png)|*.jpg;.png";
+            if(ofd.ShowDialog() == DialogResult.OK)
+            {
+                filename = ofd.FileName;
+                pictureBox1.Image = new Bitmap(filename);
+                
+            }
+        }
+
+        private void TxtSearch_Enter(object sender, EventArgs e)
+        {
+           
+
+        }
+
+        private void TxtSearch_Leave(object sender, EventArgs e)
+        {
+           
         }
     }
 }
